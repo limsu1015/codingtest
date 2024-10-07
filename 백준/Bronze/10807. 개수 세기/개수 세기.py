@@ -1,0 +1,5 @@
+n = int(input())
+y = list(map(int, input().split()))
+x = int(input())
+count = y.count(x)
+print(count)
