@@ -1,38 +1,31 @@
 import sys
-input = sys.stdin.read
-data = input().split()
+input = sys.stdin.readline
 
-# 입력 처리
-t = int(data[0])
-index = 1
-
-results = []
+t = int(input())
 
 for _ in range(t):
-    n = int(data[index])
-    index += 1
-    sticker = [list(map(int, data[index:index+n])), 
-               list(map(int, data[index+n:index+2*n]))]
-    index += 2 * n
+    n = int(input())  # 스티커 열의 개수
+    top = list(map(int, input().split()))  # 위쪽 스티커 점수
+    bottom = list(map(int, input().split()))  # 아래쪽 스티커 점수
 
-    if n == 1:  # 열이 하나인 경우
-        results.append(max(sticker[0][0], sticker[1][0]))
+    if n == 1:
+        # 열이 하나면 둘 중 큰 값을 출력
+        print(max(top[0], bottom[0]))
         continue
 
-    # DP 배열 초기화
-    dp = [[0] * n for _ in range(2)]
-    dp[0][0] = sticker[0][0]
-    dp[1][0] = sticker[1][0]
-    dp[0][1] = sticker[1][0] + sticker[0][1]
-    dp[1][1] = sticker[0][0] + sticker[1][1]
+    # 초기값 설정
+    prev_top = top[0]  # dp[0][0]
+    prev_bottom = bottom[0]  # dp[1][0]
+    curr_top = top[1] + bottom[0]  # dp[0][1]
+    curr_bottom = bottom[1] + top[0]  # dp[1][1]
 
-    # DP 점화식
+    # DP 점화식 적용
     for i in range(2, n):
-        dp[0][i] = max(dp[1][i-1], dp[1][i-2]) + sticker[0][i]
-        dp[1][i] = max(dp[0][i-1], dp[0][i-2]) + sticker[1][i]
+        new_top = top[i] + max(curr_bottom, prev_bottom)  # dp[0][i]
+        new_bottom = bottom[i] + max(curr_top, prev_top)  # dp[1][i]
+        # 갱신
+        prev_top, prev_bottom = curr_top, curr_bottom
+        curr_top, curr_bottom = new_top, new_bottom
 
-    # 최댓값 저장
-    results.append(max(dp[0][n-1], dp[1][n-1]))
-
-# 결과 출력
-sys.stdout.write("\n".join(map(str, results)) + "\n")
+    # 최댓값 출력
+    print(max(curr_top, curr_bottom))
